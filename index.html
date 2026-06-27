@@ -1176,6 +1176,16 @@ window.importLocal=async()=>{
 };
 
 // ═══════════════════════════════════════════════════════════════
+//  EXPOR HANDLERS AO WINDOW (necessário em <script type=module>)
+//  Sem isto, os onclick="" do HTML não enxergam as funções.
+// ═══════════════════════════════════════════════════════════════
+Object.assign(window,{
+  toggleEdit, closeEdit, clearEdit, saveEdit,
+  togglePending, closePending, calcPct,
+  toggleBand, toggleProva, toggleTheme
+});
+
+// ═══════════════════════════════════════════════════════════════
 //  INIT
 // ═══════════════════════════════════════════════════════════════
 renderAuthBar();
