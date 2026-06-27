@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Raio-X Dinâmico · ENAMED 2026 · Vinícius</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --bg:#F5F0EB;--card:#FFFCF9;--card2:#FDF8F5;
+  --pink:#E8537A;--rose:#C9365E;--pink-pale:#FDF0F3;--pink-light:#F9C5D3;
+  --gold:#D4943A;--blue:#4A7CE5;--green:#22A85C;--green-dk:#1B8A4A;
+  --red:#E5484D;--red-dk:#CD2B31;--orange:#E5873A;--purple:#8B5CF6;
+  --t1:#1A1A1A;--t2:#555;--t3:#888;--t4:#CCC;
+  --sep:rgba(0,0,0,.07);--sep2:rgba(0,0,0,.04);
+  --r:14px;--r-sm:10px;
+  --shadow:0 1px 4px rgba(0,0,0,.05),0 6px 20px rgba(0,0,0,.04);
+  --shadow-lg:0 4px 16px rgba(0,0,0,.08),0 16px 40px rgba(0,0,0,.07);
+}
+[data-theme="dark"]{
+  --bg:#0d0d0d;--card:#141414;--card2:#1a1a1a;
+  --pink:#ff6b9d;--rose:#e8537a;--pink-pale:rgba(232,83,122,.08);--pink-light:rgba(232,83,122,.2);
+  --t1:#e8e8e8;--t2:#aaa;--t3:#666;--t4:#333;
+  --sep:rgba(255,255,255,.08);--sep2:rgba(255,255,255,.04);
+  --shadow:0 1px 4px rgba(0,0,0,.4),0 6px 20px rgba(0,0,0,.3);
+  --shadow-lg:0 4px 16px rgba(0,0,0,.5),0 16px 40px rgba(0,0,0,.4);
+}
+
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--t1);font-family:'Inter',system-ui,sans-serif;font-size:15px;line-height:1.5;min-height:100vh;transition:background .25s,color .25s}
+
+/* ══ HERO ══ */
+.hero{
+  background:linear-gradient(160deg,#F8D0DC 0%,#EFA3B8 35%,#E8537A 70%,#C9365E 100%);
+  padding:34px 0 54px;position:relative;overflow:hidden;border-radius:0 0 28px 28px;
+}
+[data-theme="dark"] .hero{filter:brightness(.82)}
+.hero-blob{position:absolute;border-radius:50%;filter:blur(40px);opacity:.25;pointer-events:none}
+.hero-blob-1{width:200px;height:200px;background:#fff;top:-40px;right:8%}
+.hero-blob-2{width:150px;height:150px;background:var(--rose);bottom:-30px;left:5%}
+.hero-inner{max-width:1100px;margin:0 auto;padding:0 24px;position:relative;z-index:1;display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
+.hero-left{flex:1}
+.hero-brand{font-size:13px;font-weight:800;color:rgba(255,255,255,.65);letter-spacing:-.01em;margin-bottom:10px}
+.hero h1{font-size:38px;font-weight:900;letter-spacing:-.04em;color:#fff;line-height:1.05;margin-bottom:6px;text-shadow:0 2px 12px rgba(0,0,0,.1)}
+.hero-sub{font-size:13px;color:rgba(255,255,255,.75);font-weight:600}
+.btn-theme{
+  width:38px;height:38px;border-radius:50%;
+  background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);
+  color:#fff;cursor:pointer;font-size:17px;
+  display:flex;align-items:center;justify-content:center;
+  transition:background .2s;flex-shrink:0;margin-top:4px}
+.btn-theme:hover{background:rgba(255,255,255,.3)}
+
+/* ══ STATS BAR ══ */
+.stats-bar{
+  display:grid;grid-template-columns:repeat(7,1fr);gap:10px;
+  max-width:1100px;margin:-30px auto 0;padding:0 24px;position:relative;z-index:2;
+}
+.stat-card{
+  background:rgba(255,255,255,.88);backdrop-filter:blur(20px);
+  border:1px solid rgba(255,255,255,.55);border-radius:12px;
+  padding:14px 10px;text-align:center;
+  box-shadow:0 2px 12px rgba(232,83,122,.07),0 4px 16px rgba(0,0,0,.04);
+  transition:transform .2s;
+}
+[data-theme="dark"] .stat-card{background:rgba(25,25,25,.92);border-color:rgba(255,255,255,.1)}
+.stat-card:hover{transform:translateY(-2px)}
+.sv{font-size:1.4rem;font-weight:900;letter-spacing:-.03em}
+.sl{color:var(--t3);font-size:.62rem;font-weight:700;margin-top:4px;text-transform:uppercase;letter-spacing:.05em}
+
+/* ══ PAGE ══ */
+.page{max-width:1100px;margin:0 auto;padding:28px 24px 90px}
+
+/* ══ SECTION HEAD ══ */
+.section-head{display:flex;align-items:flex-end;justify-content:space-between;margin:32px 0 14px;gap:12px}
+.section-title{font-size:22px;font-weight:900;letter-spacing:-.03em}
+.section-desc{font-size:12px;color:var(--t2);margin-top:3px;line-height:1.5}
+.section-badge{font-size:11px;font-weight:700;padding:4px 13px;border-radius:100px;white-space:nowrap}
+
+/* ══ INFO CARD ══ */
+.info-card{
+  display:flex;gap:14px;align-items:flex-start;
+  border-radius:var(--r);padding:16px 18px;margin-bottom:18px;
+  background:var(--pink-pale);border:1.5px solid rgba(232,83,122,.12);
+  font-size:13px;color:var(--t2);line-height:1.6;
+}
+.info-card strong{color:var(--t1)}
+
+/* ══ MATRIX BANDS ══ */
+.mx-band{border-radius:var(--r);margin-bottom:10px;overflow:hidden;transition:box-shadow .2s}
+.mx-band:hover{box-shadow:var(--shadow)}
+
+.mx-band-hd{
+  padding:11px 18px;display:flex;align-items:center;justify-content:space-between;
+  cursor:pointer;user-select:none;
+}
+.mx-band-hd-left{display:flex;align-items:center;gap:12px}
+.mx-band-title{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:#fff}
+.mx-band-desc{font-size:11px;color:rgba(255,255,255,.7);font-weight:500}
+.mx-band-cnt{font-size:11px;font-weight:700;color:rgba(255,255,255,.85);background:rgba(255,255,255,.18);padding:3px 10px;border-radius:100px}
+.mx-band-chev{font-size:10px;color:rgba(255,255,255,.8);transition:transform .2s;margin-left:4px}
+.mx-band.closed .mx-band-chev{transform:rotate(-90deg)}
+
+.mx-band-red .mx-band-hd{background:linear-gradient(135deg,#E5484D,#CD2B31)}
+.mx-band-green .mx-band-hd{background:linear-gradient(135deg,#22A85C,#1B8A4A)}
+.mx-band-gray .mx-band-hd{background:linear-gradient(135deg,#777,#555)}
+.mx-band-dim .mx-band-hd{background:linear-gradient(135deg,#bbb,#999)}
+
+.mx-band-body{background:var(--card);border:1.5px solid var(--sep);border-top:none;border-radius:0 0 var(--r) var(--r);overflow:hidden}
+.mx-band.closed .mx-band-body{display:none}
+
+.mx-prev-hd{padding:8px 18px 2px;display:flex;align-items:center;gap:7px}
+.mx-prev-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.mx-prev-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+.prev-hd-muito .mx-prev-dot{background:var(--red)}.prev-hd-muito .mx-prev-lbl{color:var(--red)}
+.prev-hd-prevalente .mx-prev-dot{background:var(--orange)}.prev-hd-prevalente .mx-prev-lbl{color:var(--orange)}
+.prev-hd-baixa .mx-prev-dot{background:var(--t3)}.prev-hd-baixa .mx-prev-lbl{color:var(--t3)}
+
+/* ══ TOPIC ROWS ══ */
+.topic-wrap{}
+.topic-row{
+  display:flex;align-items:center;gap:9px;
+  padding:10px 18px;border-bottom:1px solid var(--sep2);
+  cursor:pointer;transition:background .12s;
+}
+.topic-row:last-of-type{border-bottom:none}
+.topic-row:hover{background:rgba(0,0,0,.02)}
+[data-theme="dark"] .topic-row:hover{background:rgba(255,255,255,.03)}
+.topic-row.expanded{background:var(--pink-pale)}
+.topic-row.is-reviewed .topic-name::after{content:' ✓';color:var(--green);font-size:11px;font-weight:700}
+
+.topic-name{flex:1;font-size:13px;font-weight:600;color:var(--t1);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.topic-row.is-reviewed .topic-name{color:var(--t2)}
+
+.area-badge{font-size:10px;font-weight:700;padding:2px 7px;border-radius:5px;white-space:nowrap;flex-shrink:0}
+.ab-CLM{background:rgba(74,124,229,.1);color:#4A7CE5}
+.ab-CIR{background:rgba(229,135,58,.12);color:var(--orange)}
+.ab-GIN{background:rgba(232,83,122,.1);color:var(--pink)}
+.ab-OBS{background:rgba(139,92,246,.1);color:var(--purple)}
+.ab-PRE{background:rgba(34,168,92,.1);color:var(--green)}
+.ab-PED{background:rgba(212,148,58,.12);color:var(--gold)}
+.ab-PSI{background:rgba(139,92,246,.14);color:#9B59B6}
+.ab-OFT{background:rgba(0,188,212,.1);color:#00BCD4}
+.ab-ORT{background:rgba(229,72,77,.1);color:var(--red)}
+
+.prev-pill{font-size:9px;font-weight:700;padding:2px 7px;border-radius:100px;flex-shrink:0;white-space:nowrap}
+.pp-muito{background:rgba(229,72,77,.1);color:var(--red)}
+.pp-prevalente{background:rgba(229,135,58,.1);color:var(--orange)}
+.pp-normal{background:rgba(0,0,0,.07);color:var(--t2)}
+[data-theme="dark"] .pp-normal{background:rgba(255,255,255,.08);color:var(--t2)}
+.pp-baixa{background:rgba(0,0,0,.05);color:var(--t3)}
+
+.score-badge{font-size:14px;font-weight:800;letter-spacing:-.02em;min-width:46px;text-align:right;flex-shrink:0;font-variant-numeric:tabular-nums}
+.sc-high{color:var(--green)}.sc-low{color:var(--red)}.sc-none{color:var(--t4);font-size:11px}
+
+.delta-badge{font-size:10px;font-weight:700;padding:2px 6px;border-radius:5px;flex-shrink:0;white-space:nowrap}
+.d-pos{background:rgba(34,168,92,.1);color:var(--green)}
+.d-neg{background:rgba(229,72,77,.1);color:var(--red)}
+
+.row-chev{font-size:10px;color:var(--t4);transition:transform .2s;flex-shrink:0}
+.topic-row.expanded .row-chev{transform:rotate(180deg)}
+
+/* ══ INLINE EDITOR ══ */
+.topic-editor{
+  padding:14px 18px 16px;
+  background:var(--pink-pale);border-bottom:1px solid var(--pink-light);
+  animation:edIn .2s ease both;
+}
+@keyframes edIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+
+.ed-base-note{font-size:11px;color:var(--t3);margin-bottom:12px;font-weight:500}
+.ed-base-note strong{color:var(--t2)}
+
+.ed-section-lbl{
+  font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;
+  color:var(--pink);margin:0 0 8px;display:flex;align-items:center;gap:8px;
+}
+.ed-section-lbl::before,.ed-section-lbl::after{content:'';flex:1;height:1px;background:var(--pink-light)}
+
+.ed-row{display:flex;gap:10px;align-items:flex-end;margin-bottom:10px;flex-wrap:wrap}
+.ed-group{display:flex;flex-direction:column;gap:4px;min-width:110px}
+.ed-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--t3)}
+.ed-input{
+  padding:8px 11px;background:var(--card);border:1.5px solid var(--pink-light);
+  border-radius:8px;font-size:14px;font-weight:700;color:var(--t1);
+  font-family:'Inter',sans-serif;outline:none;width:100%;transition:border-color .15s;
+}
+.ed-input:focus{border-color:var(--pink)}
+.ed-calc-result{
+  padding:8px 12px;background:var(--card);border:1.5px solid var(--pink-light);
+  border-radius:8px;font-size:14px;font-weight:900;color:var(--pink);
+  min-width:70px;text-align:center;font-variant-numeric:tabular-nums;
+}
+
+.ed-toggle-row{display:flex;align-items:center;gap:8px;cursor:pointer;font-size:12px;font-weight:600;color:var(--t2);margin:10px 0 12px;width:fit-content;user-select:none}
+.ed-toggle-row input{display:none}
+.ed-box{
+  width:19px;height:19px;border-radius:5px;border:2px solid var(--t4);background:var(--card);
+  display:flex;align-items:center;justify-content:center;font-size:11px;color:#fff;
+  transition:all .15s;flex-shrink:0;
+}
+.ed-toggle-row input:checked + .ed-box{background:var(--green);border-color:var(--green)}
+
+.ed-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.btn-save{
+  padding:8px 20px;background:linear-gradient(135deg,var(--pink),var(--rose));
+  border:none;border-radius:8px;color:#fff;font-size:13px;font-weight:700;
+  cursor:pointer;font-family:'Inter',sans-serif;transition:opacity .15s}
+.btn-save:hover{opacity:.9}
+.btn-cancel{
+  padding:8px 14px;background:transparent;border:1.5px solid var(--sep);
+  border-radius:8px;color:var(--t2);font-size:13px;font-weight:600;
+  cursor:pointer;font-family:'Inter',sans-serif;transition:border-color .15s}
+.btn-cancel:hover{border-color:var(--t3)}
+.btn-clear{
+  padding:8px 12px;background:transparent;border:1.5px solid rgba(229,72,77,.2);
+  border-radius:8px;color:var(--red);font-size:11px;font-weight:600;
+  cursor:pointer;font-family:'Inter',sans-serif;margin-left:auto;transition:all .15s}
+.btn-clear:hover{background:rgba(229,72,77,.06)}
+
+.empty-band{padding:16px 18px;font-size:12px;color:var(--t3);text-align:center;font-style:italic}
+
+/* ══ PENDING ══ */
+.pending-prev-hd{
+  display:flex;align-items:center;gap:8px;margin:18px 0 10px;
+  font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;
+}
+.pending-prev-hd .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+
+.pending-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+
+.pcard{
+  background:var(--card);border:1.5px solid var(--sep);border-radius:var(--r);
+  overflow:hidden;transition:all .2s;
+}
+.pcard:hover{border-color:var(--pink-light);box-shadow:var(--shadow)}
+.pcard.has-score{border-color:rgba(34,168,92,.25);background:rgba(34,168,92,.02)}
+[data-theme="dark"] .pcard.has-score{background:rgba(34,168,92,.04)}
+
+.pcard-hd{
+  display:flex;align-items:center;gap:9px;padding:11px 14px;
+  cursor:pointer;user-select:none;
+}
+.pcard-name{flex:1;font-size:13px;font-weight:700;color:var(--t1);line-height:1.35}
+.pcard-chev{font-size:10px;color:var(--t4);transition:transform .2s}
+.pcard.open .pcard-chev{transform:rotate(180deg)}
+
+.pcard-editor{
+  display:none;padding:12px 14px 14px;
+  border-top:1px solid var(--sep2);background:var(--pink-pale);
+  animation:edIn .2s ease both;
+}
+.pcard.open .pcard-editor{display:block}
+
+/* ══ PROVAS ══ */
+.provas-wrap{background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);padding:20px 22px;margin-bottom:12px}
+.provas-bar-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.provas-bar-lbl{font-size:15px;font-weight:800}
+.provas-bar-pct{font-size:16px;font-weight:900;color:var(--pink)}
+.provas-track{height:8px;background:var(--pink-light);border-radius:100px;overflow:hidden;margin-bottom:18px}
+.provas-fill{height:100%;border-radius:100px;background:linear-gradient(90deg,var(--pink),var(--rose));transition:width .5s cubic-bezier(.4,0,.2,1)}
+
+.provas-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px}
+.prova-cell{
+  background:var(--bg);border:1.5px solid var(--sep);border-radius:12px;
+  padding:13px 6px;text-align:center;transition:all .2s;
+}
+.prova-cell.all-done{background:var(--pink-pale);border-color:rgba(232,83,122,.2)}
+.prova-type{font-size:9px;color:var(--t3);font-weight:700;text-transform:uppercase;letter-spacing:.07em}
+.prova-year{font-size:20px;font-weight:900;color:var(--t1);letter-spacing:-.04em;margin:4px 0 8px}
+.prova-dots{display:flex;justify-content:center;gap:5px}
+.pd{
+  width:28px;height:28px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:10px;font-weight:700;cursor:pointer;transition:all .2s;
+}
+.pd-done{background:linear-gradient(135deg,var(--pink),var(--rose));color:#fff;box-shadow:0 2px 8px rgba(232,83,122,.3)}
+.pd-pending{background:var(--pink-pale);border:2px dashed var(--pink-light);color:var(--t4)}
+.pd-pending:hover{border-color:var(--pink);color:var(--pink)}
+
+/* ══ TOAST ══ */
+.toast{
+  position:fixed;bottom:22px;right:22px;
+  background:var(--t1);color:var(--bg);
+  padding:10px 16px;border-radius:10px;font-size:13px;font-weight:600;
+  z-index:999;opacity:0;transform:translateY(8px);transition:all .25s;pointer-events:none;
+}
+.toast.show{opacity:1;transform:translateY(0)}
+
+.scroll-top{
+  position:fixed;bottom:22px;left:22px;
+  width:38px;height:38px;border-radius:50%;
+  background:var(--pink);border:none;color:#fff;
+  font-size:16px;font-weight:700;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;transition:opacity .3s;
+  box-shadow:0 4px 12px rgba(232,83,122,.3);
+}
+.scroll-top.visible{opacity:1}
+
+/* ══ RESPONSIVE ══ */
+@media(max-width:760px){
+  .stats-bar{grid-template-columns:repeat(4,1fr)}
+  .provas-grid{grid-template-columns:repeat(4,1fr)}
+  .pending-grid{grid-template-columns:1fr}
+  .hero h1{font-size:28px}
+  .page{padding:22px 14px 80px}
+  .stats-bar{padding:0 14px}
+}
+@media(max-width:500px){
+  .stats-bar{grid-template-columns:repeat(3,1fr)}
+}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-blob hero-blob-1"></div>
+  <div class="hero-blob hero-blob-2"></div>
+  <div class="hero-inner">
+    <div class="hero-left">
+      <div class="hero-brand">Papo de Residência · ENAMED 2026</div>
+      <h1>Raio-X Dinâmico</h1>
+      <div class="hero-sub">Vinícius M S · MED 2026 · Base: 01/06/2026</div>
+    </div>
+    <button class="btn-theme" id="btn-theme" onclick="toggleTheme()" title="Alternar tema">🌙</button>
+  </div>
+</div>
+
+<div class="stats-bar" id="stats-bar"></div>
+
+<div class="page">
+
+  <div class="info-card" style="margin-top:28px">
+    <div>
+      <strong>📊 Como usar:</strong> Clique em qualquer tema para abrir o editor e registrar seu acerto atual.
+      A <strong>Matriz de Prioridade</strong> se recalcula automaticamente — temas que você melhorar migram de faixa.
+      Temas sem nota ficam na seção de Pendentes até você registrar um resultado.
+    </div>
+  </div>
+
+  <!-- MATRIX -->
+  <div class="section-head">
+    <div>
+      <div class="section-title">Matriz de Prioridade</div>
+      <div class="section-desc">Prevalência ENAMED × seu acerto. Foque no vermelho. Temas migram de faixa conforme você atualiza.</div>
+    </div>
+    <span id="matrix-badge" class="section-badge" style="background:linear-gradient(135deg,#FECDD3,#FFE5E5);color:var(--red)"></span>
+  </div>
+  <div id="matrix-container"></div>
+
+  <!-- PENDING -->
+  <div class="section-head">
+    <div>
+      <div class="section-title">Temas Pendentes</div>
+      <div class="section-desc">Ainda sem resultado registrado. Clique para adicionar acerto e mover para a matriz.</div>
+    </div>
+    <span id="pending-badge" class="section-badge" style="background:linear-gradient(135deg,#FEF3C7,#FDE68A);color:#92400E"></span>
+  </div>
+  <div id="pending-container"></div>
+
+  <!-- PROVAS -->
+  <div class="section-head">
+    <div>
+      <div class="section-title">Provas Oficiais</div>
+      <div class="section-desc">Revalida 2020–2025 + ENAMED 2026 — clique nos círculos para marcar como feita</div>
+    </div>
+    <span id="provas-badge" class="section-badge" style="background:linear-gradient(135deg,var(--pink-pale),var(--pink-light));color:var(--rose)"></span>
+  </div>
+  <div id="provas-container"></div>
+
+</div>
+
+<button class="scroll-top" id="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+//  DATA — 54 temas do Raio-X de Vinícius (01/06/2026)
+//  prevCat: 'muito' | 'prevalente' | 'normal' | 'baixa'
+//  baseScore: nota inicial do raio-x (null = pendente)
+// ═══════════════════════════════════════════════════════════════
+const TOPICS=[
+  // ─── JÁ ESTUDADOS (com score base) ───────────────────────────
+  // Crítico: alta prev, < 70%
+  {id:1,name:"Síndrome Metabólica I (HAS e DM)",area:"CLM",prevCat:"muito",baseScore:61.0},
+  {id:2,name:"Oncologia I Pt.II – Endométrio, Colo Uterino e Vulva",area:"GIN",prevCat:"muito",baseScore:63.0},
+  {id:3,name:"Medidas de Saúde Coletiva",area:"PRE",prevCat:"prevalente",baseScore:63.5},
+  {id:4,name:"Síndrome Ictérica II – Doença das Vias Biliares",area:"CIR",prevCat:"muito",baseScore:69.7},
+  // OK: alta prev, ≥ 70%
+  {id:5,name:"Oncologia I Pt.I – Mama e Ovário",area:"GIN",prevCat:"prevalente",baseScore:70.0},
+  {id:6,name:"Síndrome da Pneumonia Típica e Atípica",area:"CLM",prevCat:"prevalente",baseScore:70.0},
+  {id:7,name:"Imunização + ITU",area:"PED",prevCat:"muito",baseScore:74.0},
+  {id:8,name:"Sangramentos da Gravidez I (1ª Metade)",area:"OBS",prevCat:"muito",baseScore:77.0},
+  {id:9,name:"Doenças Clínicas na Gravidez",area:"OBS",prevCat:"muito",baseScore:77.0},
+  {id:10,name:"Síndromes Respiratórias na Infância – Parte I",area:"PED",prevCat:"prevalente",baseScore:78.3},
+  {id:11,name:"Síndrome Álgica I – Dor Abdominal",area:"CIR",prevCat:"prevalente",baseScore:80.0},
+  {id:12,name:"SUS – Evolução, Diretrizes e Financiamento",area:"PRE",prevCat:"muito",baseScore:81.1},
+  {id:13,name:"Sangramentos da Gravidez II (2ª Metade)",area:"OBS",prevCat:"muito",baseScore:81.5},
+  {id:14,name:"Síndromes Respiratórias na Infância – Parte II",area:"PED",prevCat:"prevalente",baseScore:82.3},
+  {id:15,name:"Grandes Síndromes Endócrinas I – Tireoide",area:"CLM",prevCat:"prevalente",baseScore:83.0},
+  {id:16,name:"Síndromes de Transmissão Sexual – IST",area:"GIN",prevCat:"prevalente",baseScore:83.3},
+  {id:17,name:"Síndrome Metabólica II – Diabetes e Obesidade",area:"CLM",prevCat:"prevalente",baseScore:87.9},
+  // Melhorar: baixa prev, < 70%
+  {id:18,name:"Síndrome de Hipertensão Porta",area:"CIR",prevCat:"baixa",baseScore:61.6},
+  {id:19,name:"Terapia Intensiva – Choque e PCR",area:"CLM",prevCat:"normal",baseScore:67.0},
+  {id:20,name:"Grandes Síndromes Endócrinas II – Paratireoide e Adrenal",area:"CLM",prevCat:"baixa",baseScore:68.0},
+  {id:21,name:"Síndrome Diarreica",area:"CLM",prevCat:"prevalente",baseScore:68.9},
+  {id:22,name:"Hemorragia Digestiva I – Abordagem e Conduta",area:"CIR",prevCat:"normal",baseScore:69.6},
+  // Não gastar: baixa prev, ≥ 70%
+  {id:23,name:"Síndrome de Insuficiência Hepática",area:"CIR",prevCat:"baixa",baseScore:72.1},
+  {id:24,name:"Síndrome Ictérica I – Hepatites",area:"CLM",prevCat:"baixa",baseScore:72.6},
+  {id:25,name:"Síndrome Dispéptica",area:"CIR",prevCat:"normal",baseScore:73.5},
+  {id:26,name:"Síndrome Disfágica",area:"CIR",prevCat:"baixa",baseScore:74.3},
+  {id:27,name:"Síndrome de Oclusão Intestinal",area:"CIR",prevCat:"normal",baseScore:74.8},
+  {id:28,name:"Hemorragia Digestiva II – Proctologia",area:"CIR",prevCat:"prevalente",baseScore:81.0},
+  {id:29,name:"Doenças Exantemáticas",area:"PED",prevCat:"normal",baseScore:83.2},
+  {id:30,name:"Estudos Epidemiológicos",area:"PRE",prevCat:"normal",baseScore:90.0},
+  // ─── PENDENTES (baseScore null) ──────────────────────────────
+  // Muito Prevalente
+  {id:31,name:"Vigilância em Saúde – Ética Médica",area:"PRE",prevCat:"muito",baseScore:null},
+  {id:32,name:"Intoxicações e Acidentes por Animais Peçonhentos",area:"PRE",prevCat:"muito",baseScore:null},
+  {id:33,name:"Trauma I + II",area:"CIR",prevCat:"muito",baseScore:null},
+  {id:34,name:"Síndrome Álgica III – Dor Lombar",area:"CIR",prevCat:"muito",baseScore:null},
+  {id:35,name:"Tosse Crônica",area:"CLM",prevCat:"muito",baseScore:null},
+  {id:36,name:"Síndromes Febris",area:"CLM",prevCat:"muito",baseScore:null},
+  {id:37,name:"Psiquiatria I – Transtornos do Humor",area:"PSI",prevCat:"muito",baseScore:null},
+  {id:38,name:"Ortopedia I + II",area:"ORT",prevCat:"muito",baseScore:null},
+  {id:39,name:"Crescimento e seus Distúrbios",area:"PED",prevCat:"muito",baseScore:null},
+  // Prevalente
+  {id:40,name:"Artrites",area:"CLM",prevCat:"prevalente",baseScore:null},
+  {id:41,name:"Anemias I – Carenciais",area:"CLM",prevCat:"prevalente",baseScore:null},
+  {id:42,name:"Anemias II – Hemolíticas",area:"CLM",prevCat:"prevalente",baseScore:null},
+  {id:43,name:"Síndrome da Imunodeficiência – HIV/AIDS",area:"CLM",prevCat:"prevalente",baseScore:null},
+  {id:44,name:"Vasculites",area:"CLM",prevCat:"prevalente",baseScore:null},
+  {id:45,name:"Geriatria",area:"CLM",prevCat:"prevalente",baseScore:null},
+  {id:46,name:"Sofrimento Fetal / Puerpério e Fórcipe",area:"OBS",prevCat:"prevalente",baseScore:null},
+  {id:47,name:"Anticoncepção / Climatério / Mioma e Endometriose",area:"GIN",prevCat:"prevalente",baseScore:null},
+  {id:48,name:"O Parto",area:"OBS",prevCat:"prevalente",baseScore:null},
+  {id:49,name:"Amenorreia / Infertilidade e Ovário Policístico",area:"GIN",prevCat:"prevalente",baseScore:null},
+  {id:50,name:"Avaliação Inicial da Gestação / Pré-natal",area:"OBS",prevCat:"prevalente",baseScore:null},
+  {id:51,name:"Oftalmologia I + II",area:"OFT",prevCat:"prevalente",baseScore:null},
+  {id:52,name:"Climatério e Osteoporose",area:"GIN",prevCat:"prevalente",baseScore:null},
+  {id:53,name:"Neonatologia I + II",area:"PED",prevCat:"prevalente",baseScore:null},
+  {id:54,name:"Perioperatório I + II",area:"CIR",prevCat:"prevalente",baseScore:null},
+];
+
+// ─── PROVAS INICIAIS (do Raio-X) ─────────────────────────────
+const PROVAS_INIT={
+  'r2020_1':false,'r2020_2':false,
+  'r2021_1':true, 'r2021_2':false,
+  'r2022_1':true, 'r2022_2':false,
+  'r2023_1':false,'r2023_2':false,
+  'r2024_1':false,'r2024_2':false,
+  'r2025_1':false,'r2025_2':false,
+  'e2026_1':false,
+};
+
+const PROVAS_META=[
+  {label:'Revalida',year:'2020',keys:['r2020_1','r2020_2']},
+  {label:'Revalida',year:'2021',keys:['r2021_1','r2021_2']},
+  {label:'Revalida',year:'2022',keys:['r2022_1','r2022_2']},
+  {label:'Revalida',year:'2023',keys:['r2023_1','r2023_2']},
+  {label:'Revalida',year:'2024',keys:['r2024_1','r2024_2']},
+  {label:'Revalida',year:'2025',keys:['r2025_1','r2025_2']},
+  {label:'ENAMED', year:'2026',keys:['e2026_1']},
+];
+
+// ═══════════════════════════════════════════════════════════════
+//  STATE & STORAGE
+// ═══════════════════════════════════════════════════════════════
+const KEY='raiox_v2';
+const THEME_KEY='raiox_theme';
+const PROVAS_KEY='raiox_provas_v2';
+
+let prog={}, provas={}, editingId=null, editingPendingId=null;
+
+try{prog=JSON.parse(localStorage.getItem(KEY))||{};}catch(e){}
+try{
+  const saved=JSON.parse(localStorage.getItem(PROVAS_KEY));
+  provas=saved||{...PROVAS_INIT};
+}catch(e){provas={...PROVAS_INIT};}
+
+const saveProg=()=>localStorage.setItem(KEY,JSON.stringify(prog));
+const saveProvas=()=>localStorage.setItem(PROVAS_KEY,JSON.stringify(provas));
+
+// ═══════════════════════════════════════════════════════════════
+//  THEME
+// ═══════════════════════════════════════════════════════════════
+function applyTheme(t){
+  document.documentElement.setAttribute('data-theme',t);
+  document.getElementById('btn-theme').textContent=t==='dark'?'🌙':'☀️';
+  localStorage.setItem(THEME_KEY,t);
+}
+function toggleTheme(){applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark')}
+applyTheme(localStorage.getItem(THEME_KEY)||'light');
+
+// ═══════════════════════════════════════════════════════════════
+//  HELPERS
+// ═══════════════════════════════════════════════════════════════
+function getScore(topic){
+  const p=prog[topic.id];
+  if(!p) return topic.baseScore;
+  if(p.qt>0 && p.qa>=0) return Math.round((p.qa/p.qt)*1000)/10;
+  if(p.cp!==null&&p.cp!==undefined&&p.cp!=='') return +p.cp;
+  return topic.baseScore;
+}
+function isAlta(cat){return cat==='muito'||cat==='prevalente'}
+function getQuad(topic){
+  const s=getScore(topic);
+  if(s===null) return 'pending';
+  const a=isAlta(topic.prevCat);
+  if(a&&s<70) return 'critico';
+  if(a&&s>=70) return 'forte';
+  if(!a&&s<70) return 'melhorar';
+  return 'nao';
+}
+function isReviewed(id){return !!(prog[id]&&prog[id].rev)}
+function prevLabel(cat){return{muito:'Muito Prev.',prevalente:'Prevalente',normal:'Normal',baixa:'Baixa Prev.'}[cat]||cat}
+// Para temas do Raio-X: referência = baseScore. Para temas pendentes: referência = firstScore (1ª vez que registrou)
+function getRefScore(topic){
+  if(topic.baseScore!==null) return topic.baseScore;
+  const p=prog[topic.id];
+  return(p&&p.firstScore!==undefined)?+p.firstScore:null;
+}
+
+function calcPct(id){
+  const q=+document.getElementById('eq-'+id).value;
+  const a=+document.getElementById('ea-'+id).value;
+  const el=document.getElementById('epct-'+id);
+  if(el) el.textContent=(q>0&&a>=0)?((a/q)*100).toFixed(1)+'%':'—';
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  STATS
+// ═══════════════════════════════════════════════════════════════
+function computeStats(){
+  const scores=TOPICS.map(t=>getScore(t)).filter(s=>s!==null);
+  const avg=scores.length?Math.round(scores.reduce((a,b)=>a+b,0)/scores.length*10)/10:0;
+  const criticos=TOPICS.filter(t=>getQuad(t)==='critico').length;
+  const fortes=TOPICS.filter(t=>getQuad(t)==='forte').length;
+  const pending=TOPICS.filter(t=>getQuad(t)==='pending').length;
+  const revisados=TOPICS.filter(t=>isReviewed(t.id)).length;
+  const provasDone=Object.values(provas).filter(Boolean).length;
+  const provasTotal=Object.keys(PROVAS_INIT).length;
+  return{studied:scores.length,total:TOPICS.length,avg,criticos,fortes,pending,revisados,provasDone,provasTotal};
+}
+
+function renderStats(){
+  const s=computeStats();
+  const svColor=(val,thr,hi,lo)=>`color:${val>=thr?hi:lo}`;
+  document.getElementById('stats-bar').innerHTML=`
+    <div class="stat-card">
+      <div class="sv" style="color:var(--pink)">${s.studied}<span style="font-size:.9rem;font-weight:500;color:var(--t3)">/${s.total}</span></div>
+      <div class="sl">Estudados</div>
+    </div>
+    <div class="stat-card">
+      <div class="sv" style="color:var(--red)">${s.criticos}</div>
+      <div class="sl">🔴 Críticos</div>
+    </div>
+    <div class="stat-card">
+      <div class="sv" style="color:var(--green)">${s.fortes}</div>
+      <div class="sl">🟢 OK</div>
+    </div>
+    <div class="stat-card">
+      <div class="sv" style="${svColor(s.avg,70,'var(--green)','var(--red)')}">${s.avg}%</div>
+      <div class="sl">Média acerto</div>
+    </div>
+    <div class="stat-card">
+      <div class="sv" style="color:var(--orange)">${s.pending}</div>
+      <div class="sl">Pendentes</div>
+    </div>
+    <div class="stat-card">
+      <div class="sv" style="color:var(--purple)">${s.revisados}</div>
+      <div class="sl">Revisados</div>
+    </div>
+    <div class="stat-card">
+      <div class="sv" style="color:var(--blue)">${s.provasDone}<span style="font-size:.9rem;font-weight:500;color:var(--t3)">/${s.provasTotal}</span></div>
+      <div class="sl">Provas feitas</div>
+    </div>
+  `;
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  EDITOR HTML
+// ═══════════════════════════════════════════════════════════════
+function editorInner(topic){
+  const p=prog[topic.id]||{};
+  const q=p.qt||''; const a=p.qa!==undefined?p.qa:'';
+  const cp=p.cp||''; const rev=p.rev||false;
+  const calc=q&&a!==''?((+a/+q)*100).toFixed(1)+'%':'—';
+  const hasProg=p.qt||p.cp;
+  let baseNote;
+  if(topic.baseScore!==null){
+    baseNote='Raio-X (base): <strong>'+topic.baseScore+'%</strong>';
+  }else if(p.firstScore!==undefined){
+    baseNote='Primeiro acerto registrado: <strong>'+(+p.firstScore).toFixed(1)+'%</strong> — atualize para acompanhar progresso';
+  }else{
+    baseNote='<em>Nenhum acerto anterior — este será o primeiro registro.</em>';
+  }
+
+  return`
+<div class="ed-base-note">${baseNote}</div>
+<div class="ed-section-lbl">Calcular pelo acerto</div>
+<div class="ed-row">
+  <div class="ed-group" style="min-width:130px">
+    <label class="ed-label">Questões respondidas</label>
+    <input class="ed-input" type="number" id="eq-${topic.id}" value="${q}" placeholder="ex: 50" min="0" oninput="calcPct(${topic.id})">
+  </div>
+  <div class="ed-group" style="min-width:110px">
+    <label class="ed-label">Acertadas</label>
+    <input class="ed-input" type="number" id="ea-${topic.id}" value="${a}" placeholder="ex: 38" min="0" oninput="calcPct(${topic.id})">
+  </div>
+  <div class="ed-group">
+    <label class="ed-label">Resultado</label>
+    <div class="ed-calc-result" id="epct-${topic.id}">${calc}</div>
+  </div>
+</div>
+<div class="ed-section-lbl">OU digitar porcentagem diretamente</div>
+<div class="ed-row" style="margin-bottom:8px">
+  <div class="ed-group" style="min-width:160px">
+    <label class="ed-label">% de acerto</label>
+    <input class="ed-input" type="number" id="ep-${topic.id}" value="${cp}" placeholder="ex: 75.5" min="0" max="100" step="0.1">
+  </div>
+</div>
+<label class="ed-toggle-row" id="erev-wrap-${topic.id}">
+  <input type="checkbox" id="er-${topic.id}" ${rev?'checked':''}>
+  <div class="ed-box">${rev?'✓':''}</div>
+  <span>Marcar como revisado</span>
+</label>
+<div class="ed-actions">
+  <button class="btn-save" onclick="saveEdit(${topic.id})">Salvar</button>
+  <button class="btn-cancel" onclick="closeEdit()">Cancelar</button>
+  ${hasProg?`<button class="btn-clear" onclick="clearEdit(${topic.id})">Limpar dados</button>`:''}
+</div>`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  TOPIC ROW HTML
+// ═══════════════════════════════════════════════════════════════
+function topicRowHtml(topic){
+  const score=getScore(topic);
+  const reviewed=isReviewed(topic.id);
+  const expanded=editingId===topic.id;
+
+  const scoreTxt=score!==null?score.toFixed(1)+'%':'—';
+  const scoreClass=score===null?'sc-none':score>=70?'sc-high':'sc-low';
+
+  const ref=getRefScore(topic);
+  let deltaHtml='';
+  if(score!==null&&ref!==null&&Math.abs(score-ref)>=0.05){
+    const d=Math.round((score-ref)*10)/10;
+    const refLabel=topic.baseScore!==null?'vs. Raio-X':'vs. 1º acerto';
+    deltaHtml=`<span class="delta-badge ${d>0?'d-pos':'d-neg'}" title="${refLabel}: ${ref.toFixed(1)}%">${d>0?'+':''}${d}%</span>`;
+  }
+
+  return`<div class="topic-wrap">
+  <div class="topic-row${expanded?' expanded':''}${reviewed?' is-reviewed':''}" onclick="toggleEdit(${topic.id})" id="trow-${topic.id}">
+    <span class="topic-name">${topic.name}</span>
+    <span class="area-badge ab-${topic.area}">${topic.area}</span>
+    <span class="prev-pill pp-${topic.prevCat}">${prevLabel(topic.prevCat)}</span>
+    ${deltaHtml}
+    <span class="score-badge ${scoreClass}">${scoreTxt}</span>
+    <span class="row-chev${expanded?' expanded':''}">▾</span>
+  </div>
+  <div class="topic-editor" id="editor-${topic.id}" style="display:${expanded?'block':'none'}">
+    ${expanded?editorInner(topic):''}
+  </div>
+</div>`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  RENDER MATRIX
+// ═══════════════════════════════════════════════════════════════
+function renderMatrix(){
+  const bands=[
+    {key:'critico',  cls:'mx-band-red',  label:'🔴 Crítico',  desc:'alta prevalência · acerto < 70%',  emptyMsg:'Nenhum tema crítico — ótimo!'},
+    {key:'forte',    cls:'mx-band-green',label:'🟢 Mantendo', desc:'alta prevalência · acerto ≥ 70%',  emptyMsg:'Ainda sem temas com bom acerto aqui'},
+    {key:'melhorar', cls:'mx-band-gray', label:'⚫ Melhorar',  desc:'baixa prevalência · acerto < 70%', emptyMsg:'Nenhum tema aqui no momento'},
+    {key:'nao',      cls:'mx-band-dim',  label:'⬜ Não gastar',desc:'baixa prevalência · acerto ≥ 70%', emptyMsg:'Nenhum tema aqui no momento'},
+  ];
+
+  // Group topics with scores by quad, then by prevCat within
+  const grouped={critico:[],forte:[],melhorar:[],nao:[]};
+  TOPICS.forEach(t=>{
+    const q=getQuad(t);
+    if(q!=='pending') grouped[q].push(t);
+  });
+
+  // Sort: critico/melhorar ascending score, forte/nao descending
+  grouped.critico.sort((a,b)=>getScore(a)-getScore(b));
+  grouped.melhorar.sort((a,b)=>getScore(a)-getScore(b));
+  grouped.forte.sort((a,b)=>getScore(b)-getScore(a));
+  grouped.nao.sort((a,b)=>getScore(b)-getScore(a));
+
+  const totCritico=grouped.critico.length;
+  document.getElementById('matrix-badge').textContent=
+    totCritico>0?`${totCritico} tema${totCritico>1?'s':''} crítico${totCritico>1?'s':''}!`:`0 críticos ✓`;
+
+  let html='';
+  bands.forEach(band=>{
+    const topics=grouped[band.key];
+    const isClosed=band.key==='nao'; // start collapsed
+    
+    // Sub-group by prevCat for display
+    const prevOrder=band.key==='critico'||band.key==='forte'
+      ?['muito','prevalente']
+      :['normal','baixa','prevalente'];
+    
+    let bodyHtml='';
+    prevOrder.forEach(pcat=>{
+      const sub=topics.filter(t=>t.prevCat===pcat);
+      if(!sub.length) return;
+      const prevLabels={muito:'Muito Prevalente',prevalente:'Prevalente',normal:'Normal/Moderada',baixa:'Baixa Prevalência'};
+      const hd_class={muito:'prev-hd-muito',prevalente:'prev-hd-prevalente',normal:'prev-hd-baixa',baixa:'prev-hd-baixa'}[pcat]||'prev-hd-baixa';
+      bodyHtml+=`<div class="mx-prev-hd ${hd_class}"><div class="mx-prev-dot"></div><span class="mx-prev-lbl">${prevLabels[pcat]}</span></div>`;
+      sub.forEach(t=>{ bodyHtml+=topicRowHtml(t); });
+    });
+    if(!topics.length) bodyHtml=`<div class="empty-band">${band.emptyMsg}</div>`;
+
+    html+=`<div class="mx-band ${band.cls}${isClosed?' closed':''}" id="band-${band.key}">
+  <div class="mx-band-hd" onclick="toggleBand('${band.key}')">
+    <div class="mx-band-hd-left">
+      <span class="mx-band-title">${band.label}</span>
+      <span class="mx-band-desc">${band.desc}</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <span class="mx-band-cnt">${topics.length}</span>
+      <span class="mx-band-chev">▾</span>
+    </div>
+  </div>
+  <div class="mx-band-body">${bodyHtml}</div>
+</div>`;
+  });
+
+  document.getElementById('matrix-container').innerHTML=html;
+}
+
+function toggleBand(key){
+  document.getElementById('band-'+key).classList.toggle('closed');
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  RENDER PENDING
+// ═══════════════════════════════════════════════════════════════
+function renderPending(){
+  const pending=TOPICS.filter(t=>getQuad(t)==='pending');
+  document.getElementById('pending-badge').textContent=`${pending.length} tema${pending.length!==1?'s':''}`;
+
+  if(!pending.length){
+    document.getElementById('pending-container').innerHTML=
+      `<div style="padding:20px;text-align:center;font-size:13px;color:var(--t3)">🎉 Todos os temas têm resultado registrado!</div>`;
+    return;
+  }
+
+  const groups=[
+    {cat:'muito',label:'Muito Prevalente',color:'var(--red)',dotColor:'var(--red)'},
+    {cat:'prevalente',label:'Prevalente',color:'#92400E',dotColor:'var(--orange)'},
+    {cat:'normal',label:'Normal',color:'var(--t2)',dotColor:'var(--t3)'},
+    {cat:'baixa',label:'Baixa Prevalência',color:'var(--t3)',dotColor:'var(--t4)'},
+  ];
+
+  let html='';
+  groups.forEach(g=>{
+    const sub=pending.filter(t=>t.prevCat===g.cat);
+    if(!sub.length) return;
+    html+=`<div class="pending-prev-hd" style="color:${g.color}">
+      <div class="dot" style="background:${g.dotColor}"></div>
+      ${g.label} · ${sub.length} tema${sub.length!==1?'s':''}
+    </div>
+    <div class="pending-grid">`;
+    sub.forEach(t=>{
+      const ep=editingPendingId===t.id;
+      html+=`<div class="pcard${ep?' open':''}" id="pcard-${t.id}">
+  <div class="pcard-hd" onclick="togglePending(${t.id})">
+    <div>
+      <div style="display:flex;align-items:center;gap:7px;margin-bottom:4px">
+        <span class="area-badge ab-${t.area}">${t.area}</span>
+        <span class="prev-pill pp-${t.prevCat}">${prevLabel(t.prevCat)}</span>
+      </div>
+      <div class="pcard-name">${t.name}</div>
+    </div>
+    <span class="pcard-chev">▾</span>
+  </div>
+  <div class="pcard-editor">
+    ${pendingEditorInner(t)}
+  </div>
+</div>`;
+    });
+    html+='</div>';
+  });
+
+  document.getElementById('pending-container').innerHTML=html;
+}
+
+function pendingEditorInner(topic){
+  const p=prog[topic.id]||{};
+  const q=p.qt||''; const a=p.qa!==undefined?p.qa:''; const cp=p.cp||'';
+  const calc=q&&a!==''?((+a/+q)*100).toFixed(1)+'%':'—';
+  const hasFirst=p.firstScore!==undefined;
+  const sectionLbl=hasFirst?'Atualizar resultado':'Registrar primeiro resultado';
+  const firstNote=hasFirst
+    ?'<div class="ed-base-note">Primeiro acerto registrado: <strong>'+(+p.firstScore).toFixed(1)+'%</strong> — atualize para ver sua evolução</div>'
+    :'<div class="ed-base-note"><em>Este será seu primeiro acerto registrado — ficará salvo para comparação futura.</em></div>';
+  return`
+${firstNote}
+<div class="ed-section-lbl">${sectionLbl}</div>
+<div class="ed-row">
+  <div class="ed-group" style="min-width:120px">
+    <label class="ed-label">Questões respondidas</label>
+    <input class="ed-input" type="number" id="eq-${topic.id}" value="${q}" placeholder="ex: 50" min="0" oninput="calcPct(${topic.id})">
+  </div>
+  <div class="ed-group" style="min-width:100px">
+    <label class="ed-label">Acertadas</label>
+    <input class="ed-input" type="number" id="ea-${topic.id}" value="${a}" placeholder="ex: 38" min="0" oninput="calcPct(${topic.id})">
+  </div>
+  <div class="ed-group">
+    <label class="ed-label">Resultado</label>
+    <div class="ed-calc-result" id="epct-${topic.id}">${calc}</div>
+  </div>
+</div>
+<div class="ed-row" style="margin-bottom:10px">
+  <div class="ed-group" style="min-width:150px">
+    <label class="ed-label">OU: % diretamente</label>
+    <input class="ed-input" type="number" id="ep-${topic.id}" value="${cp}" placeholder="ex: 75.5" min="0" max="100" step="0.1">
+  </div>
+</div>
+<div class="ed-actions">
+  <button class="btn-save" onclick="saveEdit(${topic.id})">Salvar e mover para matriz</button>
+  <button class="btn-cancel" onclick="closePending()">Cancelar</button>
+</div>`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  EDIT ACTIONS
+// ═══════════════════════════════════════════════════════════════
+function toggleEdit(id){
+  if(editingId===id){closeEdit();return;}
+  editingId=id;
+  editingPendingId=null;
+  renderAll();
+  setTimeout(()=>{
+    const el=document.getElementById('editor-'+id);
+    if(el){el.style.display='block';el.scrollIntoView({behavior:'smooth',block:'nearest'});}
+  },50);
+}
+
+function togglePending(id){
+  if(editingPendingId===id){closePending();return;}
+  editingPendingId=id;
+  editingId=null;
+  renderPending();
+  setTimeout(()=>{
+    const el=document.getElementById('pcard-'+id);
+    if(el) el.scrollIntoView({behavior:'smooth',block:'nearest'});
+  },50);
+}
+
+function closeEdit(){editingId=null;renderAll();}
+function closePending(){editingPendingId=null;renderPending();}
+
+function saveEdit(id){
+  const qEl=document.getElementById('eq-'+id);
+  const aEl=document.getElementById('ea-'+id);
+  const pEl=document.getElementById('ep-'+id);
+  const rEl=document.getElementById('er-'+id);
+
+  const q=qEl?+qEl.value||null:null;
+  const a=aEl?(aEl.value!==''?+aEl.value:null):null;
+  const cp=pEl?(pEl.value!==''?+pEl.value:null):null;
+  const rev=rEl?rEl.checked:false;
+
+  if(!prog[id]) prog[id]={};
+
+  // Para temas sem score base (pendentes): guarda o firstScore na 1ª vez, nunca sobrescreve
+  const topic=TOPICS.find(t=>t.id===id);
+  if(topic&&topic.baseScore===null&&prog[id].firstScore===undefined){
+    let fs=null;
+    if(q&&a!==null) fs=Math.round((a/q)*1000)/10;
+    else if(cp!==null) fs=+cp;
+    if(fs!==null) prog[id].firstScore=fs;
+  }
+
+  prog[id].qt=q;
+  prog[id].qa=a;
+  prog[id].cp=(q&&a!==null)?null:cp;
+  prog[id].rev=rev;
+
+  saveProg();
+  editingId=null;
+  editingPendingId=null;
+  renderAll();
+  showToast('✅ Salvo!');
+}
+
+function clearEdit(id){
+  if(!confirm('Limpar dados de acerto deste tema?')) return;
+  if(prog[id]){prog[id].qt=null;prog[id].qa=null;prog[id].cp=null;}
+  saveProg();
+  editingId=null;
+  renderAll();
+  showToast('🗑️ Dados limpos');
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  RENDER PROVAS
+// ═══════════════════════════════════════════════════════════════
+function renderProvas(){
+  const total=Object.keys(PROVAS_INIT).length;
+  const done=Object.values(provas).filter(Boolean).length;
+  const pct=Math.round(done/total*100);
+
+  document.getElementById('provas-badge').textContent=`${done}/${total}`;
+
+  let cellsHtml='';
+  PROVAS_META.forEach(p=>{
+    const allDone=p.keys.every(k=>provas[k]);
+    let dots=p.keys.map((k,i)=>`
+      <div class="pd ${provas[k]?'pd-done':'pd-pending'}" onclick="toggleProva('${k}')" title="${provas[k]?'Feita — clique para desmarcar':'Clique para marcar como feita'}">
+        ${provas[k]?'✓':(i+1)}
+      </div>`).join('');
+    cellsHtml+=`<div class="prova-cell ${allDone?'all-done':''}">
+  <div class="prova-type">${p.label}</div>
+  <div class="prova-year">${p.year}</div>
+  <div class="prova-dots">${dots}</div>
+</div>`;
+  });
+
+  document.getElementById('provas-container').innerHTML=`
+<div class="provas-wrap">
+  <div class="provas-bar-head">
+    <span class="provas-bar-lbl">${done} de ${total} provas concluídas</span>
+    <span class="provas-bar-pct">${pct}%</span>
+  </div>
+  <div class="provas-track"><div class="provas-fill" style="width:${pct}%"></div></div>
+  <div class="provas-grid">${cellsHtml}</div>
+</div>`;
+}
+
+function toggleProva(key){
+  provas[key]=!provas[key];
+  saveProvas();
+  renderProvas();
+  renderStats();
+  showToast(provas[key]?'✅ Prova marcada como feita!':'↩️ Desmarcada');
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  RENDER ALL
+// ═══════════════════════════════════════════════════════════════
+function renderAll(){
+  renderStats();
+  renderMatrix();
+  renderPending();
+  renderProvas();
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  TOAST & SCROLL
+// ═══════════════════════════════════════════════════════════════
+let toastTimer;
+function showToast(msg){
+  const t=document.getElementById('toast');t.textContent=msg;
+  t.classList.add('show');clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove('show'),2400);
+}
+window.addEventListener('scroll',()=>{
+  document.getElementById('scroll-top').classList.toggle('visible',window.scrollY>400);
+});
+
+// ═══════════════════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════════════════
+renderAll();
+</script>
+</body>
+</html>
