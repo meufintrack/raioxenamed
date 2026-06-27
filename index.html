@@ -312,6 +312,51 @@ body{background:var(--bg);color:var(--t1);font-family:'Inter',system-ui,sans-ser
 @media(max-width:500px){
   .stats-bar{grid-template-columns:repeat(3,1fr)}
 }
+/* ══ AUTH ══ */
+.hero-right-actions{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.auth-bar{display:flex;align-items:center;gap:8px}
+.auth-avatar{width:30px;height:30px;border-radius:50%;border:2px solid rgba(255,255,255,.5);object-fit:cover}
+.auth-name{font-size:12px;font-weight:700;color:#fff;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.btn-auth{
+  padding:7px 14px;border-radius:100px;font-size:12px;font-weight:700;cursor:pointer;
+  background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);color:#fff;
+  font-family:'Inter',sans-serif;transition:background .2s}
+.btn-auth:hover{background:rgba(255,255,255,.3)}
+.btn-auth-in{background:#fff;color:var(--rose)}
+
+.login-gate{
+  display:none;align-items:center;justify-content:center;
+  max-width:1100px;margin:30px auto 0;padding:40px 24px;min-height:50vh}
+.gate-card{
+  background:var(--card);border:1.5px solid var(--sep);border-radius:var(--r);
+  box-shadow:var(--shadow-lg);padding:40px 34px;text-align:center;max-width:380px}
+.gate-icon{font-size:40px;margin-bottom:14px}
+.gate-title{font-size:24px;font-weight:900;letter-spacing:-.03em;margin-bottom:10px}
+.gate-desc{font-size:13px;color:var(--t2);line-height:1.6;margin-bottom:22px}
+.btn-gate{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:12px 26px;border:none;border-radius:100px;cursor:pointer;
+  background:linear-gradient(135deg,var(--pink),var(--rose));color:#fff;
+  font-size:14px;font-weight:800;font-family:'Inter',sans-serif;
+  box-shadow:0 4px 14px rgba(232,83,122,.35);transition:opacity .15s}
+.btn-gate:hover{opacity:.92}
+
+/* ══ SYNC + IMPORT ══ */
+.sync-banner{display:flex;align-items:center;gap:10px;margin:0 0 12px;font-size:12px;font-weight:600;color:var(--t3)}
+.sync-dot{width:8px;height:8px;border-radius:50%;background:var(--t4);transition:background .3s;flex-shrink:0}
+.sync-dot.on{background:var(--green);box-shadow:0 0 8px rgba(34,168,92,.5)}
+.sync-dot.err{background:var(--red)}
+.import-wrap{margin-bottom:16px}
+.import-card{
+  display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+  background:var(--pink-pale);border:1.5px solid var(--pink-light);border-radius:var(--r);
+  padding:13px 16px;font-size:13px;font-weight:600;color:var(--t2)}
+.btn-import{
+  margin-left:auto;padding:8px 16px;border:none;border-radius:8px;cursor:pointer;
+  background:linear-gradient(135deg,var(--pink),var(--rose));color:#fff;
+  font-size:12px;font-weight:800;font-family:'Inter',sans-serif;white-space:nowrap}
+.btn-import:hover{opacity:.9}
+
 </style>
 </head>
 <body>
@@ -325,13 +370,41 @@ body{background:var(--bg);color:var(--t1);font-family:'Inter',system-ui,sans-ser
       <h1>Raio-X Dinâmico</h1>
       <div class="hero-sub">Vinícius M S · MED 2026 · Base: 01/06/2026</div>
     </div>
-    <button class="btn-theme" id="btn-theme" onclick="toggleTheme()" title="Alternar tema">🌙</button>
+    <div class="hero-right-actions">
+      <div class="auth-bar" id="auth-bar"></div>
+      <button class="btn-theme" id="btn-theme" onclick="toggleTheme()" title="Alternar tema">🌙</button>
+    </div>
   </div>
 </div>
 
 <div class="stats-bar" id="stats-bar"></div>
 
-<div class="page">
+<!-- LOGIN GATE -->
+<div class="login-gate" id="login-gate">
+  <div class="gate-card">
+    <div class="gate-icon">🔒</div>
+    <div class="gate-title">Raio-X Dinâmico</div>
+    <div class="gate-desc">Seus dados de desempenho são privados e ficam protegidos na sua conta Google. Entre para acessar e sincronizar entre dispositivos.</div>
+    <button class="btn-gate" onclick="loginGoogle()">
+      <span style="font-size:16px">🔑</span> Entrar com Google
+    </button>
+  </div>
+</div>
+
+<div class="page" id="page" style="display:none">
+
+  <!-- SYNC + IMPORT -->
+  <div class="sync-banner">
+    <span class="sync-dot" id="sync-dot"></span>
+    <span id="sync-text">Aguardando login</span>
+  </div>
+  <div class="import-wrap" id="import-wrap" style="display:none">
+    <div class="import-card">
+      <span>💾 Encontrei dados salvos neste navegador (seu notebook). Quer trazer suas % para a nuvem?</span>
+      <button class="btn-import" onclick="importLocal()">Importar agora</button>
+    </div>
+  </div>
+
 
   <div class="info-card" style="margin-top:28px">
     <div>
@@ -376,7 +449,34 @@ body{background:var(--bg);color:var(--t1);font-family:'Inter',system-ui,sans-ser
 <button class="scroll-top" id="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
 <div class="toast" id="toast"></div>
 
-<script>
+<script type="module">
+// ═══════════════════════════════════════════════════════════════
+//  FIREBASE + AUTH
+// ═══════════════════════════════════════════════════════════════
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, doc, setDoc, onSnapshot }
+  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged }
+  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCe4gswBgEg_P_OoK3OSGVzcJ8UvPi2xQI",
+  authDomain: "raioxenamed.firebaseapp.com",
+  projectId: "raioxenamed",
+  storageBucket: "raioxenamed.firebasestorage.app",
+  messagingSenderId: "589840678619",
+  appId: "1:589840678619:web:39c42e657529293aaf96fe"
+};
+const fbApp = initializeApp(firebaseConfig);
+const db = getFirestore(fbApp);
+const auth = getAuth(fbApp);
+const provider = new GoogleAuthProvider();
+
+let currentUser=null;
+let docRef=null;
+let unsub=null;        // firestore listener unsubscribe
+let cloudReady=false;  // true once we've received the first snapshot
+
 // ═══════════════════════════════════════════════════════════════
 //  DATA — 54 temas do Raio-X de Vinícius (01/06/2026)
 //  prevCat: 'muito' | 'prevalente' | 'normal' | 'baixa'
@@ -475,16 +575,23 @@ const KEY='raiox_v2';
 const THEME_KEY='raiox_theme';
 const PROVAS_KEY='raiox_provas_v2';
 
-let prog={}, provas={}, editingId=null, editingPendingId=null;
+let prog={}, provas={...PROVAS_INIT}, editingId=null, editingPendingId=null;
 
-try{prog=JSON.parse(localStorage.getItem(KEY))||{};}catch(e){}
-try{
-  const saved=JSON.parse(localStorage.getItem(PROVAS_KEY));
-  provas=saved||{...PROVAS_INIT};
-}catch(e){provas={...PROVAS_INIT};}
-
-const saveProg=()=>localStorage.setItem(KEY,JSON.stringify(prog));
-const saveProvas=()=>localStorage.setItem(PROVAS_KEY,JSON.stringify(provas));
+// Push the whole state to Firestore (debounced). Only writes when logged in.
+let saveTimer=null;
+function pushCloud(){
+  if(!docRef||!cloudReady) return;
+  setSync('saving');
+  clearTimeout(saveTimer);
+  saveTimer=setTimeout(async()=>{
+    try{
+      await setDoc(docRef,{prog,provas});
+      setSync('on');
+    }catch(e){console.error(e);setSync('err');showToast('Erro ao salvar na nuvem');}
+  },350);
+}
+const saveProg=()=>pushCloud();
+const saveProvas=()=>pushCloud();
 
 // ═══════════════════════════════════════════════════════════════
 //  THEME
@@ -971,9 +1078,108 @@ window.addEventListener('scroll',()=>{
 });
 
 // ═══════════════════════════════════════════════════════════════
+//  SYNC STATUS
+// ═══════════════════════════════════════════════════════════════
+function setSync(s){
+  const dot=document.getElementById('sync-dot');
+  const txt=document.getElementById('sync-text');
+  if(!dot||!txt)return;
+  dot.className='sync-dot';
+  if(s==='on'){dot.classList.add('on');txt.textContent='Sincronizado com a nuvem';}
+  else if(s==='saving'){dot.classList.add('on');txt.textContent='Salvando…';}
+  else if(s==='err'){dot.classList.add('err');txt.textContent='Erro de conexão';}
+  else txt.textContent='Aguardando login';
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  AUTH
+// ═══════════════════════════════════════════════════════════════
+window.loginGoogle=async()=>{
+  try{ await signInWithPopup(auth,provider); }
+  catch(e){ console.error(e); showToast('Falha no login: '+(e.code||e.message)); }
+};
+window.logout=async()=>{ await signOut(auth); };
+
+function renderAuthBar(){
+  const bar=document.getElementById('auth-bar');
+  const gate=document.getElementById('login-gate');
+  const page=document.getElementById('page');
+  if(currentUser){
+    gate.style.display='none';
+    page.style.display='block';
+    bar.innerHTML=`
+      <img src="${currentUser.photoURL||''}" referrerpolicy="no-referrer" class="auth-avatar" onerror="this.style.display='none'">
+      <span class="auth-name">${currentUser.displayName||currentUser.email}</span>
+      <button class="btn-auth" onclick="logout()">Sair</button>`;
+  }else{
+    gate.style.display='flex';
+    page.style.display='none';
+    bar.innerHTML=`<button class="btn-auth btn-auth-in" onclick="loginGoogle()">Entrar com Google</button>`;
+  }
+}
+
+onAuthStateChanged(auth,user=>{
+  currentUser=user;
+  if(unsub){unsub();unsub=null;}
+  cloudReady=false;
+  renderAuthBar();
+  if(!user){
+    prog={}; provas={...PROVAS_INIT};
+    return;
+  }
+  // Listen to this user's private document
+  docRef=doc(db,'users',user.uid,'raiox','data');
+  setSync('connecting');
+  unsub=onSnapshot(docRef,snap=>{
+    if(snap.exists()){
+      const d=snap.data();
+      prog=d.prog||{};
+      provas=d.provas||{...PROVAS_INIT};
+    }else{
+      // First login ever — empty cloud. Keep defaults, offer import.
+      prog={}; provas={...PROVAS_INIT};
+    }
+    cloudReady=true;
+    setSync('on');
+    renderAll();
+    maybeShowImport();
+  },err=>{console.error(err);setSync('err');showToast('Sem acesso ao Firestore — verifique as regras');});
+});
+
+// ═══════════════════════════════════════════════════════════════
+//  IMPORT — traz os dados do localStorage (notebook antigo) p/ nuvem
+// ═══════════════════════════════════════════════════════════════
+function readLocal(){
+  let lp={},lv=null;
+  try{lp=JSON.parse(localStorage.getItem(KEY))||{};}catch(e){}
+  try{lv=JSON.parse(localStorage.getItem(PROVAS_KEY));}catch(e){}
+  const hasData=(lp&&Object.keys(lp).length)|| (lv&&Object.keys(lv).length);
+  return hasData?{prog:lp,provas:lv||{...PROVAS_INIT}}:null;
+}
+function maybeShowImport(){
+  const local=readLocal();
+  const cloudEmpty=!prog||Object.keys(prog).length===0;
+  const btn=document.getElementById('import-wrap');
+  if(local&&cloudEmpty){ btn.style.display='block'; }
+  else{ btn.style.display='none'; }
+}
+window.importLocal=async()=>{
+  const local=readLocal();
+  if(!local){showToast('Nada para importar neste navegador');return;}
+  if(!confirm('Importar suas % salvas neste navegador para a nuvem? Isso vai sobrescrever os dados atuais da sua conta.'))return;
+  prog=local.prog; provas=local.provas;
+  cloudReady=true;
+  await setDoc(docRef,{prog,provas});
+  document.getElementById('import-wrap').style.display='none';
+  renderAll();
+  showToast('✅ Dados importados para a nuvem!');
+};
+
+// ═══════════════════════════════════════════════════════════════
 //  INIT
 // ═══════════════════════════════════════════════════════════════
-renderAll();
+renderAuthBar();
+setSync('idle');
 </script>
 </body>
 </html>
