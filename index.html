@@ -357,6 +357,29 @@ body{background:var(--bg);color:var(--t1);font-family:'Inter',system-ui,sans-ser
   font-size:12px;font-weight:800;font-family:'Inter',sans-serif;white-space:nowrap}
 .btn-import:hover{opacity:.9}
 
+/* ══ CUSTOM TOPICS ══ */
+.btn-add-topic{
+  padding:6px 14px;background:linear-gradient(135deg,var(--pink),var(--rose));
+  border:none;border-radius:100px;color:#fff;font-size:12px;font-weight:700;
+  cursor:pointer;font-family:'Inter',sans-serif;transition:opacity .15s;white-space:nowrap}
+.btn-add-topic:hover{opacity:.9}
+.custom-pill{font-size:10px;font-weight:700;padding:2px 8px;border-radius:100px;
+  background:linear-gradient(135deg,#FDE68A,#FCD34D);color:#92400E;white-space:nowrap}
+.ct-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;
+  align-items:center;justify-content:center;z-index:1000;padding:20px}
+.ct-overlay.show{display:flex}
+.ct-modal{background:var(--card,#fff);border-radius:16px;padding:24px;width:100%;
+  max-width:420px;box-shadow:0 20px 60px rgba(0,0,0,.3);max-height:90vh;overflow:auto}
+.ct-title{font-size:17px;font-weight:800;color:var(--t1);margin-bottom:4px}
+.ct-desc{font-size:12px;color:var(--t3);line-height:1.45;margin-bottom:16px}
+.ct-label{display:block;font-size:11px;font-weight:700;color:var(--t2);
+  text-transform:uppercase;letter-spacing:.04em;margin:12px 0 5px}
+.ct-input{width:100%;padding:9px 12px;border:1.5px solid var(--sep);border-radius:8px;
+  font-size:14px;font-family:'Inter',sans-serif;color:var(--t1);background:var(--bg,#fff);
+  box-sizing:border-box}
+.ct-input:focus{outline:none;border-color:var(--pink)}
+.ct-actions{display:flex;gap:8px;margin-top:20px}
+
 </style>
 </head>
 <body>
@@ -420,7 +443,10 @@ body{background:var(--bg);color:var(--t1);font-family:'Inter',system-ui,sans-ser
       <div class="section-title">Matriz de Prioridade</div>
       <div class="section-desc">Prevalência ENAMED × seu acerto. Foque no vermelho. Temas migram de faixa conforme você atualiza.</div>
     </div>
-    <span id="matrix-badge" class="section-badge" style="background:linear-gradient(135deg,#FECDD3,#FFE5E5);color:var(--red)"></span>
+    <div style="display:flex;align-items:center;gap:10px">
+      <button class="btn-add-topic" onclick="openCustomModal()">+ Adicionar tema</button>
+      <span id="matrix-badge" class="section-badge" style="background:linear-gradient(135deg,#FECDD3,#FFE5E5);color:var(--red)"></span>
+    </div>
   </div>
   <div id="matrix-container"></div>
 
@@ -447,6 +473,41 @@ body{background:var(--bg);color:var(--t1);font-family:'Inter',system-ui,sans-ser
 </div>
 
 <button class="scroll-top" id="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<!-- MODAL: adicionar tema personalizado -->
+<div class="ct-overlay" id="ct-overlay" onclick="if(event.target===this)closeCustomModal()">
+  <div class="ct-modal">
+    <div class="ct-title">Adicionar tema personalizado</div>
+    <div class="ct-desc">Cria um tema fora da lista oficial do Raio-X. Fica salvo na sua conta e entra na matriz/pendentes igual aos demais.</div>
+    <label class="ct-label">Nome do tema</label>
+    <input class="ct-input" id="ct-name" type="text" placeholder="ex: Cefaleias e Enxaqueca" maxlength="80">
+    <label class="ct-label">Área</label>
+    <select class="ct-input" id="ct-area">
+      <option value="CLM">Clínica Médica (CLM)</option>
+      <option value="CIR">Cirurgia Geral (CIR)</option>
+      <option value="GIN">Ginecologia (GIN)</option>
+      <option value="OBS">Obstetrícia (OBS)</option>
+      <option value="PED">Pediatria (PED)</option>
+      <option value="PRE">Preventiva (PRE)</option>
+      <option value="PSI">Psiquiatria (PSI)</option>
+      <option value="ORT">Ortopedia (ORT)</option>
+      <option value="OFT">Oftalmologia (OFT)</option>
+    </select>
+    <label class="ct-label">Prevalência ENAMED</label>
+    <select class="ct-input" id="ct-prev">
+      <option value="muito">Muito Prevalente</option>
+      <option value="prevalente">Prevalente</option>
+      <option value="normal">Normal</option>
+      <option value="baixa" selected>Baixa Prevalência</option>
+    </select>
+    <label class="ct-label">% de acerto inicial (opcional)</label>
+    <input class="ct-input" id="ct-score" type="number" min="0" max="100" step="0.1" placeholder="deixe vazio p/ começar como Pendente">
+    <div class="ct-actions">
+      <button class="btn-save" onclick="addCustomTopic()">Adicionar</button>
+      <button class="btn-cancel" onclick="closeCustomModal()">Cancelar</button>
+    </div>
+  </div>
+</div>
 <div class="toast" id="toast"></div>
 
 <script type="module">
@@ -545,6 +606,9 @@ const TOPICS=[
   {id:52,name:"Climatério e Osteoporose",area:"GIN",prevCat:"prevalente",baseScore:null},
   {id:53,name:"Neonatologia I + II",area:"PED",prevCat:"prevalente",baseScore:null},
   {id:54,name:"Perioperatório I + II",area:"CIR",prevCat:"prevalente",baseScore:null},
+  // ─── JÁ ESTUDADOS (faltava sincronizar do Raio-X individualizado) ───
+  {id:55,name:"Grandes Síndromes Bacterianas – Parte 1",area:"CLM",prevCat:"baixa",baseScore:73.0},
+  {id:56,name:"Grandes Síndromes Bacterianas – Parte 2",area:"CLM",prevCat:"baixa",baseScore:73.0},
 ];
 
 // ─── PROVAS INICIAIS (do Raio-X) ─────────────────────────────
@@ -575,7 +639,16 @@ const KEY='raiox_v2';
 const THEME_KEY='raiox_theme';
 const PROVAS_KEY='raiox_provas_v2';
 
-let prog={}, provas={...PROVAS_INIT}, editingId=null, editingPendingId=null;
+let prog={}, provas={...PROVAS_INIT}, custom=[], editingId=null, editingPendingId=null;
+
+// Temas fixos (oficiais) + temas personalizados do usuário.
+// IDs custom começam em 1000 para nunca colidir com os fixos.
+function getAllTopics(){ return TOPICS.concat(custom); }
+function nextCustomId(){
+  const max=custom.reduce((m,t)=>Math.max(m,t.id),999);
+  return max+1;
+}
+function isCustom(id){ return id>=1000; }
 
 // Push the whole state to Firestore (debounced). Only writes when logged in.
 let saveTimer=null;
@@ -585,7 +658,7 @@ function pushCloud(){
   clearTimeout(saveTimer);
   saveTimer=setTimeout(async()=>{
     try{
-      await setDoc(docRef,{prog,provas});
+      await setDoc(docRef,{prog,provas,custom});
       setSync('on');
     }catch(e){console.error(e);setSync('err');showToast('Erro ao salvar na nuvem');}
   },350);
@@ -644,15 +717,16 @@ function calcPct(id){
 //  STATS
 // ═══════════════════════════════════════════════════════════════
 function computeStats(){
-  const scores=TOPICS.map(t=>getScore(t)).filter(s=>s!==null);
+  const ALL=getAllTopics();
+  const scores=ALL.map(t=>getScore(t)).filter(s=>s!==null);
   const avg=scores.length?Math.round(scores.reduce((a,b)=>a+b,0)/scores.length*10)/10:0;
-  const criticos=TOPICS.filter(t=>getQuad(t)==='critico').length;
-  const fortes=TOPICS.filter(t=>getQuad(t)==='forte').length;
-  const pending=TOPICS.filter(t=>getQuad(t)==='pending').length;
-  const revisados=TOPICS.filter(t=>isReviewed(t.id)).length;
+  const criticos=ALL.filter(t=>getQuad(t)==='critico').length;
+  const fortes=ALL.filter(t=>getQuad(t)==='forte').length;
+  const pending=ALL.filter(t=>getQuad(t)==='pending').length;
+  const revisados=ALL.filter(t=>isReviewed(t.id)).length;
   const provasDone=Object.values(provas).filter(Boolean).length;
   const provasTotal=Object.keys(PROVAS_INIT).length;
-  return{studied:scores.length,total:TOPICS.length,avg,criticos,fortes,pending,revisados,provasDone,provasTotal};
+  return{studied:scores.length,total:ALL.length,avg,criticos,fortes,pending,revisados,provasDone,provasTotal};
 }
 
 function renderStats(){
@@ -741,6 +815,7 @@ function editorInner(topic){
   <button class="btn-save" onclick="saveEdit(${topic.id})">Salvar</button>
   <button class="btn-cancel" onclick="closeEdit()">Cancelar</button>
   ${hasProg?`<button class="btn-clear" onclick="clearEdit(${topic.id})">Limpar dados</button>`:''}
+  ${isCustom(topic.id)?`<button class="btn-clear" onclick="deleteCustom(${topic.id})">🗑️ Excluir tema</button>`:''}
 </div>`;
 }
 
@@ -768,6 +843,7 @@ function topicRowHtml(topic){
     <span class="topic-name">${topic.name}</span>
     <span class="area-badge ab-${topic.area}">${topic.area}</span>
     <span class="prev-pill pp-${topic.prevCat}">${prevLabel(topic.prevCat)}</span>
+    ${isCustom(topic.id)?'<span class="custom-pill" title="Tema personalizado">★ meu</span>':''}
     ${deltaHtml}
     <span class="score-badge ${scoreClass}">${scoreTxt}</span>
     <span class="row-chev${expanded?' expanded':''}">▾</span>
@@ -791,7 +867,7 @@ function renderMatrix(){
 
   // Group topics with scores by quad, then by prevCat within
   const grouped={critico:[],forte:[],melhorar:[],nao:[]};
-  TOPICS.forEach(t=>{
+  getAllTopics().forEach(t=>{
     const q=getQuad(t);
     if(q!=='pending') grouped[q].push(t);
   });
@@ -853,7 +929,7 @@ function toggleBand(key){
 //  RENDER PENDING
 // ═══════════════════════════════════════════════════════════════
 function renderPending(){
-  const pending=TOPICS.filter(t=>getQuad(t)==='pending');
+  const pending=getAllTopics().filter(t=>getQuad(t)==='pending');
   document.getElementById('pending-badge').textContent=`${pending.length} tema${pending.length!==1?'s':''}`;
 
   if(!pending.length){
@@ -937,6 +1013,7 @@ ${firstNote}
 <div class="ed-actions">
   <button class="btn-save" onclick="saveEdit(${topic.id})">Salvar e mover para matriz</button>
   <button class="btn-cancel" onclick="closePending()">Cancelar</button>
+  ${isCustom(topic.id)?`<button class="btn-clear" onclick="deleteCustom(${topic.id})">🗑️ Excluir tema</button>`:''}
 </div>`;
 }
 
@@ -982,7 +1059,7 @@ function saveEdit(id){
   if(!prog[id]) prog[id]={};
 
   // Para temas sem score base (pendentes): guarda o firstScore na 1ª vez, nunca sobrescreve
-  const topic=TOPICS.find(t=>t.id===id);
+  const topic=getAllTopics().find(t=>t.id===id);
   if(topic&&topic.baseScore===null&&prog[id].firstScore===undefined){
     let fs=null;
     if(q&&a!==null) fs=Math.round((a/q)*1000)/10;
@@ -1124,7 +1201,7 @@ onAuthStateChanged(auth,user=>{
   cloudReady=false;
   renderAuthBar();
   if(!user){
-    prog={}; provas={...PROVAS_INIT};
+    prog={}; provas={...PROVAS_INIT}; custom=[];
     return;
   }
   // Listen to this user's private document
@@ -1135,9 +1212,10 @@ onAuthStateChanged(auth,user=>{
       const d=snap.data();
       prog=d.prog||{};
       provas=d.provas||{...PROVAS_INIT};
+      custom=Array.isArray(d.custom)?d.custom:[];
     }else{
       // First login ever — empty cloud. Keep defaults, offer import.
-      prog={}; provas={...PROVAS_INIT};
+      prog={}; provas={...PROVAS_INIT}; custom=[];
     }
     cloudReady=true;
     setSync('on');
@@ -1169,7 +1247,7 @@ window.importLocal=async()=>{
   if(!confirm('Importar suas % salvas neste navegador para a nuvem? Isso vai sobrescrever os dados atuais da sua conta.'))return;
   prog=local.prog; provas=local.provas;
   cloudReady=true;
-  await setDoc(docRef,{prog,provas});
+  await setDoc(docRef,{prog,provas,custom});
   document.getElementById('import-wrap').style.display='none';
   renderAll();
   showToast('✅ Dados importados para a nuvem!');
@@ -1179,10 +1257,58 @@ window.importLocal=async()=>{
 //  EXPOR HANDLERS AO WINDOW (necessário em <script type=module>)
 //  Sem isto, os onclick="" do HTML não enxergam as funções.
 // ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
+//  CUSTOM TOPICS
+// ═══════════════════════════════════════════════════════════════
+function openCustomModal(){
+  if(!currentUser){ showToast('Entre com sua conta para adicionar temas'); return; }
+  document.getElementById('ct-name').value='';
+  document.getElementById('ct-area').value='CLM';
+  document.getElementById('ct-prev').value='baixa';
+  document.getElementById('ct-score').value='';
+  document.getElementById('ct-overlay').classList.add('show');
+  setTimeout(()=>document.getElementById('ct-name').focus(),50);
+}
+function closeCustomModal(){
+  document.getElementById('ct-overlay').classList.remove('show');
+}
+function addCustomTopic(){
+  const name=document.getElementById('ct-name').value.trim();
+  const area=document.getElementById('ct-area').value;
+  const prevCat=document.getElementById('ct-prev').value;
+  const scoreRaw=document.getElementById('ct-score').value;
+  if(!name){ showToast('Dê um nome ao tema'); return; }
+  let baseScore=null;
+  if(scoreRaw!==''){
+    const s=+scoreRaw;
+    if(isNaN(s)||s<0||s>100){ showToast('% inválida (0–100)'); return; }
+    baseScore=Math.round(s*10)/10;
+  }
+  const id=nextCustomId();
+  custom.push({id,name,area,prevCat,baseScore,isCustom:true});
+  pushCloud();
+  closeCustomModal();
+  renderAll();
+  showToast('✅ Tema adicionado!');
+}
+function deleteCustom(id){
+  if(!isCustom(id)) return;
+  const t=custom.find(x=>x.id===id);
+  if(!t) return;
+  if(!confirm(`Excluir o tema "${t.name}"? Os dados de acerto dele também serão removidos.`)) return;
+  custom=custom.filter(x=>x.id!==id);
+  if(prog[id]) delete prog[id];
+  editingId=null; editingPendingId=null;
+  pushCloud();
+  renderAll();
+  showToast('🗑️ Tema excluído');
+}
+
 Object.assign(window,{
   toggleEdit, closeEdit, clearEdit, saveEdit,
   togglePending, closePending, calcPct,
-  toggleBand, toggleProva, toggleTheme
+  toggleBand, toggleProva, toggleTheme,
+  openCustomModal, closeCustomModal, addCustomTopic, deleteCustom
 });
 
 // ═══════════════════════════════════════════════════════════════
